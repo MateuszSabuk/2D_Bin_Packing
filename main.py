@@ -41,11 +41,12 @@ class BoxStackingProblem:
 def main():
     bsp = BoxStackingProblem() # Create the main solver
     bsp.bin_size = (10, 10) # Set the size for the containers
-    bsp.generate_boxes(1, 10, 5)  # Generate boxes (5 boxes with dimensions ranging from 1 to 10)
+    bsp.generate_boxes(1, 10, 10)  # Generate boxes (5 boxes with dimensions ranging from 1 to 10)
     
     # Try solving the problem
     try:
         bsp.solve(Algorithms.HFF)
+        bsp.solve(Algorithms.HNF)
     except ValidationError as err:
         print(f"Exception: {err}")
 

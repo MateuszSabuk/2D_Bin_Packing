@@ -6,6 +6,8 @@ class Algorithms:
     Algorithms for the problem solving\\
     Provides an enum of the functions
     '''
+
+    # PRIVATE HELPER FUNCTIONS
     @staticmethod
     def __FFDH(boxes: list[Box], bin_widht) -> list[list[Box]]:
         boxes.sort(key=lambda box: box.h, reverse=True)  # Sort boxes by height in decreasing order
@@ -20,14 +22,13 @@ class Algorithms:
                 available_strip_space = bin_widht
                 for placed_box in strip:
                     available_strip_space -= placed_box.w
-                if available_strip_space > box.w: # Check if the box fits into the strip
+                if available_strip_space >= box.w: # Check if the box fits into the strip
                     strip.append(box)
                     placed = True
             if not placed: # Create new strip
                 strips.append([box])
 
         return strips
-
 
     @staticmethod
     def __FFD(strips: list[list[Box]], bin_height):
@@ -41,13 +42,51 @@ class Algorithms:
                 available_bin_space = bin_height
                 for placed_strip in bin:
                     available_bin_space -= placed_strip[0].h
-                if available_bin_space > strip[0].h:
+                if available_bin_space >= strip[0].h:
                     bin.append(strip)
                     placed = True
             if not placed: # Create new bin
                 bins.append([strip])    
 
         return bins
+
+
+    @staticmethod
+    def __NFDH(boxes: list[Box], bin_widht) -> list[list[Box]]:
+        boxes.sort(key=lambda box: box.h, reverse=True)  # Sort boxes by height in decreasing order
+
+        strips: list[list[Box]] = [[]]
+
+        i = 0
+        for box in boxes:
+            available_strip_space = bin_widht
+            for placed_box in strips[i]:
+                available_strip_space -= placed_box.w
+            if available_strip_space >= box.w: # Check if the box fits into the strip
+                strips[i].append(box)
+            else: # Create new strip
+                strips.append([box])
+                i += 1
+
+        return strips
+
+    @staticmethod
+    def __NFD(strips: list[list[Box]], bin_height):
+        bins: list[list[list[Box]]] = [[]]
+
+        i = 0
+        for strip in strips:
+            available_bin_space = bin_height
+            for placed_strip in bins[i]:
+                available_bin_space -= placed_strip[0].h
+            if available_bin_space >= strip[0].h:
+                bins[i].append(strip)
+            else:
+                bins.append([strip])
+                i += 1
+
+        return bins
+    
     
     @staticmethod
     def __unstrip_bins(bins_with_strips: list[list[list[Box]]]):
@@ -70,6 +109,7 @@ class Algorithms:
     
     @staticmethod
     def HFF(bin_size: tuple, boxes: list[Box]):
+        '''Hybrid First-Fit'''
         # First phase: FFDH algorithm to create a strip packing
         strips = Algorithms.__FFDH(boxes, bin_widht=bin_size[0])
         # Second phase: FFD algorithm to create finite bin packing solutions
@@ -79,7 +119,11 @@ class Algorithms:
     @staticmethod
     def HNF(bin_size: tuple, boxes: list[Box]):
         '''Hybrid Next-Fit'''
-        pass
+        # First phase: NFDH algorithm to create a strip packing
+        strips = Algorithms.__NFDH(boxes, bin_widht=bin_size[0])
+        # Second phase: NFD algorithm to create finite bin packing solutions
+        bins_with_strips = Algorithms.__NFD(strips, bin_height=bin_size[1])
+        return Algorithms.__unstrip_bins(bins_with_strips)
 
     @staticmethod
     def HBF(bin_size: tuple, boxes: list[Box]):
