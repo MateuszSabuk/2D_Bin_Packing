@@ -1,54 +1,54 @@
-import random
+import tkinter as tk
+
 from helpers import *
 from algorithms import Algorithms
 
-class BoxStackingProblem:
-    '''Main problem solving class'''
+class BinPackingApp:
     def __init__(self):
-        self.boxes = []
-        self.bin_size = None
+        self.master = tk.Tk()
+        self.canvas = tk.Canvas(self.master, width=1000, height=1000, bg='white')
+        self.canvas.pack()
+        self.num = 0
 
-    def generate_boxes(self, min_dim: int, max_dim: int, num_boxes: int):
-        '''
-        Initializes the self.boxes list
-        ### Arguments
-        - `min_dim` - min length of the boxes
-        - `max_dim` - max length of the boxes
-        - `num_boxes` - number of the boxes
-        '''
-        self.boxes = [] # Empty the array
-        for _ in range(num_boxes):
-            self.boxes.append(Box(tuple(random.randint(min_dim, max_dim) for _ in range(2))))
+    def run(self):
+        self.master.mainloop()
 
-    def solve(self, algorithm) -> list[Box]:
-        '''
-        Run the solver using selected algorithm
-        ### Arguments
-        - `algorithm` - reference to a method of Algorithms Class
-        '''
-        # Validate state of the variables
-        if self.bin_size == None:
-            raise ValidationError("Bin size not initialized", "bin_size")
-        if not self.boxes:
-            raise ValidationError("List of boxes not initialized", "boxes")
-        if not callable(algorithm):
-            raise ValidationError("Wrong algorithm", "algorithm")
-
-        # Run selected algorithm on the chosen data
-        print(algorithm(self.bin_size, self.boxes))
-
+    def draw_bins(self, bins, bin_size):
+        scale = 10
+        bin_offset = scale * 1.1 * bin_size[0]
+        bin_y_offset = scale * 1.1 * bin_size[1]
+        for bin_idx, bin in enumerate(bins):
+            self.canvas.create_rectangle(   bin_idx * bin_offset,
+                                            self.num * bin_y_offset,
+                                            bin_idx * bin_offset + bin_size[0] * scale,
+                                            self.num * bin_y_offset + bin_size[1] * scale,
+                                            outline='black')
+            for box_idx, box in enumerate(bin):
+                x0 = box.x * scale + bin_offset * bin_idx
+                y0 = box.y * scale + bin_y_offset * self.num
+                x1 = x0 + box.w * scale
+                y1 = y0 + box.h * scale
+                self.canvas.create_rectangle(x0, y0, x1, y1, outline='red')
+                # self.canvas.create_text((x0 + x1) / 2, (y0 + y1) / 2, text=f'Box {bin_idx}-{box_idx}')
+        self.num += 1
 
 def main():
-    bsp = BoxStackingProblem() # Create the main solver
-    bsp.bin_size = (10, 10) # Set the size for the containers
-    bsp.generate_boxes(1, 10, 10)  # Generate boxes (5 boxes with dimensions ranging from 1 to 10)
+    app = BinPackingApp()
+
+    bss = BoxStackingSolver() # Create the main solver
+    bss.bin_size = (20, 15) # Set the size for the containers
+    bss.generate_boxes(1, 10, 20)  # Generate boxes (5 boxes with dimensions ranging from 1 to 10)
     
     # Try solving the problem
     try:
-        bsp.solve(Algorithms.HFF)
-        bsp.solve(Algorithms.HNF)
+        bins1 = bss.solve(Algorithms.HFF)
+        bins2 = bss.solve(Algorithms.HNF)
     except ValidationError as err:
         print(f"Exception: {err}")
+    
+    app.draw_bins(bins1, bin_size = bss.bin_size)
+    app.draw_bins(bins2, bin_size = bss.bin_size)
+    app.run()
 
 
 if __name__ == "__main__":
