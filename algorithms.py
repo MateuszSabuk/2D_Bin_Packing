@@ -1,10 +1,20 @@
-from enum import Enum
 from helpers import Box
 
 class Algorithms:
     '''
     Algorithms for the problem solving\\
-    Provides an enum of the functions
+    Provides multiple functions:
+    - Two-phase algorithms
+        - HFF - Hybrid First-Fit
+        - HNF - Hybrid Next-Fit
+        - HBF - Hybrid Best-Fit
+        - FC - Floor-Ceiling
+    - One-phase algorithms
+        - FNF - Finite Next-Fit
+        - FFF - Finite First-Fit
+        - FBL - Finite Bottom-left
+        - NBL - Next Bottom-left
+        - AD - Alternate Directions
     '''
 
     # PRIVATE HELPER FUNCTIONS
@@ -89,7 +99,7 @@ class Algorithms:
     
     
     @staticmethod
-    def __unstrip_bins(bins_with_strips: list[list[list[Box]]]):
+    def __unstrip_bins(bins_with_strips: list[list[list[Box]]]) -> list[list[Box]]:
         '''Sets the positions of the boxes in each bin'''
         bins: list[list[Box]] = [[] for _ in bins_with_strips]
 
@@ -108,7 +118,7 @@ class Algorithms:
 
     
     @staticmethod
-    def HFF(bin_size: tuple, boxes: list[Box]):
+    def HFF(bin_size: tuple, boxes: list[Box]) -> list[list[Box]]:
         '''Hybrid First-Fit'''
         # First phase: FFDH algorithm to create a strip packing
         strips = Algorithms.__FFDH(boxes, bin_widht=bin_size[0])
@@ -117,7 +127,7 @@ class Algorithms:
         return Algorithms.__unstrip_bins(bins_with_strips)
 
     @staticmethod
-    def HNF(bin_size: tuple, boxes: list[Box]):
+    def HNF(bin_size: tuple, boxes: list[Box]) -> list[list[Box]]:
         '''Hybrid Next-Fit'''
         # First phase: NFDH algorithm to create a strip packing
         strips = Algorithms.__NFDH(boxes, bin_widht=bin_size[0])

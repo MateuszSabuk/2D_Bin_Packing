@@ -18,18 +18,21 @@ class BinPackingApp:
         bin_offset = scale * 1.1 * bin_size[0]
         bin_y_offset = scale * 1.1 * bin_size[1]
         for bin_idx, bin in enumerate(bins):
-            self.canvas.create_rectangle(   bin_idx * bin_offset,
-                                            self.num * bin_y_offset,
-                                            bin_idx * bin_offset + bin_size[0] * scale,
-                                            self.num * bin_y_offset + bin_size[1] * scale,
-                                            outline='black')
             for box_idx, box in enumerate(bin):
                 x0 = box.x * scale + bin_offset * bin_idx
                 y0 = box.y * scale + bin_y_offset * self.num
                 x1 = x0 + box.w * scale
                 y1 = y0 + box.h * scale
                 self.canvas.create_rectangle(x0, y0, x1, y1, outline='red')
+                # # Indexes on each for diagnostics
                 # self.canvas.create_text((x0 + x1) / 2, (y0 + y1) / 2, text=f'Box {bin_idx}-{box_idx}')
+            
+            # Draw a rectangle for each bin
+            self.canvas.create_rectangle(   bin_idx * bin_offset,
+                                            self.num * bin_y_offset,
+                                            bin_idx * bin_offset + bin_size[0] * scale,
+                                            self.num * bin_y_offset + bin_size[1] * scale,
+                                            outline='black')
         self.num += 1
 
 def main():
@@ -43,11 +46,13 @@ def main():
     try:
         bins1 = bss.solve(Algorithms.HFF)
         bins2 = bss.solve(Algorithms.HNF)
+
+        # Draw the data
+        app.draw_bins(bins1, bin_size = bss.bin_size)
+        app.draw_bins(bins2, bin_size = bss.bin_size)
     except ValidationError as err:
         print(f"Exception: {err}")
     
-    app.draw_bins(bins1, bin_size = bss.bin_size)
-    app.draw_bins(bins2, bin_size = bss.bin_size)
     app.run()
 
 
