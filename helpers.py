@@ -8,10 +8,7 @@ class ValidationError(Exception):
     Error thrown when attempting to solve the problem
     ### Values
     - `.message` - message of the error
-    - `.val` - is one of the strings:
-        - "bin_size"
-        - "boxes"
-        - "algorithm"
+    - `.val` - is a specific error code string
     '''
     def __init__(self, message, val):
         super().__init__(message)
@@ -40,17 +37,23 @@ class BoxStackingSolver:
         self.boxes = []
         self.bin_size = None
 
-    def generate_boxes(self, min_dim: int, max_dim: int, num_boxes: int) -> None:
+    def generate_boxes(self, min_w: int, max_w: int, min_h: int, max_h: int, num_boxes: int) -> None:
         '''
         Initializes the self.boxes list
         ### Arguments
-        - `min_dim` - min length of the boxes
-        - `max_dim` - max length of the boxes
+        - `min_w` - min width of the boxes
+        - `max_w` - max width of the boxes
+        - `min_h` - min height of the boxes
+        - `max_h` - max height of the boxes
         - `num_boxes` - number of the boxes
         '''
+        if min_w > max_w or min_h > max_h or min_w <= 0 or min_h <= 0:
+            raise ValidationError("Wrong generation dimensions", "gen_dim")
+
         self.boxes = [] # Empty the array
         for _ in range(num_boxes):
-            self.boxes.append(Box(tuple(random.randint(min_dim, max_dim) for _ in range(2))))
+            self.boxes.append(Box((random.randint(min_w, min(max_w, self.bin_size[0])),
+                                    random.randint(min_h, min(max_h, self.bin_size[1])))))
 
     def solve(self, algorithm) -> list[Box]:
         '''
@@ -91,3 +94,12 @@ class BoxStackingSolver:
             else:
                 raise ValidationError( f"Error while parsing boxes input at line {i+1}: {line}", f"bad_line:{i}")
         self.boxes = new_boxes
+
+    def update_bin_size(self, text: str) -> None:
+        match = re.match(r'([1-9]\d*)x([1-9]\d*)', text)
+        if match:
+            w, h = map(int, match.groups())
+            self.bin_size = (w, h)
+        else:
+            raise ValidationError( f"Error while parsing bin size", f"bin_size_parsing")
+        
