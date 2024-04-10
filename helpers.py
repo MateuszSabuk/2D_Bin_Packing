@@ -24,7 +24,7 @@ class Box:
     - `.x and .y` - position of the box\\
     if equal to None then the box is not positioned
     '''
-    def __init__(self,size):
+    def __init__(self,size: tuple):
         self.w, self.h = size
         self.x, self.y = None, None
 
@@ -37,7 +37,7 @@ class BoxStackingSolver:
         self.boxes = []
         self.bin_size = None
 
-    def generate_boxes(self, min_dim: int, max_dim: int, num_boxes: int):
+    def generate_boxes(self, min_dim: int, max_dim: int, num_boxes: int) -> None:
         '''
         Initializes the self.boxes list
         ### Arguments
@@ -65,3 +65,14 @@ class BoxStackingSolver:
 
         # Run selected algorithm on the chosen data
         return algorithm(self.bin_size, copy.deepcopy(self.boxes))
+    
+    def get_boxes_text(self) -> str:
+        arr = [f"{box.w}x{box.h}" for box in self.boxes]
+        return "\n".join(arr)
+    
+    def update_boxes_from_txt(self, text: str) -> None:
+        new_boxes = []
+        for line in text.splitlines():
+            width, height = map(int, line.split("x"))
+            new_boxes.append(Box((width, height)))
+        self.boxes = new_boxes
