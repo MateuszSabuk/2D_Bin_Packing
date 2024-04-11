@@ -7,58 +7,61 @@ class BinPackingApp:
     def __init__(self):
         self.bss = BoxStackingSolver() # Create the main solver
         self.master = tk.Tk()
+        self.num = 0
+
+        self.inputs_frame = tk.Frame(self.master)
+        self.inputs_frame.grid(row = 0, column = 0,sticky="n")
 
         # Generation parameters inputs
-        self.inputs_frame = tk.Frame(self.master)
-        self.inputs_frame.grid(row = 0, column = 0, padx = 2)
+        self.box_gen_inputs_frame = tk.Frame(self.inputs_frame)
+        self.box_gen_inputs_frame.pack()
         
-        tk.Label(self.inputs_frame, text="Box dimensions:").grid(row = 0, column = 0, columnspan=3)
+        tk.Label(self.box_gen_inputs_frame, text="Box dimensions:").grid(row = 0, column = 0, columnspan=3)
 
-        tk.Label(self.inputs_frame, text="<= width <=").grid(row = 1, column = 1)
-        self.min_box_width_entry: tk.Entry = tk.Entry(self.inputs_frame, width=8)
+        tk.Label(self.box_gen_inputs_frame, text="<= width <=").grid(row = 1, column = 1)
+        self.min_box_width_entry: tk.Entry = tk.Entry(self.box_gen_inputs_frame, width=8)
         self.min_box_width_entry.insert(0,"1")
         self.min_box_width_entry.grid(row = 1, column = 0, padx = 2)
 
-        self.max_box_width_entry: tk.Entry = tk.Entry(self.inputs_frame, width=8)
+        self.max_box_width_entry: tk.Entry = tk.Entry(self.box_gen_inputs_frame, width=8)
         self.max_box_width_entry.insert(0,"10")
         self.max_box_width_entry.grid(row = 1, column = 2, padx = 2)
 
-        tk.Label(self.inputs_frame, text="<= height <=").grid(row = 2, column = 1)
-        self.min_box_height_entry: tk.Entry = tk.Entry(self.inputs_frame, width=8)
+        tk.Label(self.box_gen_inputs_frame, text="<= height <=").grid(row = 2, column = 1)
+        self.min_box_height_entry: tk.Entry = tk.Entry(self.box_gen_inputs_frame, width=8)
         self.min_box_height_entry.insert(0,"2")
         self.min_box_height_entry.grid(row = 2, column = 0, padx = 2)
 
-        self.max_box_height_entry: tk.Entry = tk.Entry(self.inputs_frame, width=8)
+        self.max_box_height_entry: tk.Entry = tk.Entry(self.box_gen_inputs_frame, width=8)
         self.max_box_height_entry.insert(0,"12")
         self.max_box_height_entry.grid(row = 2, column = 2, padx = 2)
 
-        tk.Label(self.inputs_frame, text="Num of boxes:").grid(row = 3, column = 0, columnspan=2)
-        self.num_of_boxes_entry: tk.Entry = tk.Entry(self.inputs_frame, width=8)
+        tk.Label(self.box_gen_inputs_frame, text="Num of boxes:").grid(row = 3, column = 0, columnspan=2)
+        self.num_of_boxes_entry: tk.Entry = tk.Entry(self.box_gen_inputs_frame, width=8)
         self.num_of_boxes_entry.insert(0,"20")
         self.num_of_boxes_entry.grid(row=3, column=2)
 
-        tk.Label(self.inputs_frame, text="Bin dimensions:").grid(row = 4, column = 0, columnspan=3)
-        self.bin_size_entry: tk.Entry = tk.Entry(self.inputs_frame, width=20)
+        tk.Label(self.box_gen_inputs_frame, text="Bin dimensions:").grid(row = 4, column = 0, columnspan=3)
+        self.bin_size_entry: tk.Entry = tk.Entry(self.box_gen_inputs_frame, width=20)
         self.bin_size_entry.insert(0,"20x15")
         self.bin_size_entry.grid(row=5, column=0, columnspan=3)
 
         # Buttons and others
-        self.gen_boxes_button = tk.Button(self.master,
+        self.gen_boxes_button = tk.Button(self.inputs_frame,
             text="Generate Boxes",
             command= self.gen_boxes)
-        self.gen_boxes_button.grid(row = 1, column = 0, padx = 2)
+        self.gen_boxes_button.pack(pady=5)
 
-        self.boxes_text: tk.Text = tk.Text(self.master, width=20)
-        self.boxes_text.grid(row = 2, column = 0, padx = 2)
+        self.boxes_text: tk.Text = tk.Text(self.inputs_frame, width=20)
+        self.boxes_text.pack()
 
-        self.run_solver_button = tk.Button(self.master,
+        self.run_solver_button = tk.Button(self.inputs_frame,
             text="Run Solver",
             command= self.run_solver)
-        self.run_solver_button.grid(row = 3, column = 0, padx = 2)
+        self.run_solver_button.pack(pady=5)
 
         self.canvas = tk.Canvas(self.master, width=1000, height=1000, bg='white')
-        self.canvas.grid(row = 0, column = 1, sticky = tk.W, padx = 2, rowspan=4)
-        self.num = 0
+        self.canvas.grid(row = 0, column = 1, sticky = tk.W, padx = 2)
 
     def run(self):
         self.master.mainloop()
