@@ -19,7 +19,7 @@ class Algorithms:
 
     # PRIVATE HELPER FUNCTIONS
     @staticmethod
-    def __FFDH(boxes: list[Box], bin_widht) -> list[list[Box]]:
+    def __FFDH(boxes: list[Box], bin_width) -> list[list[Box]]:
         boxes.sort(key=lambda box: box.h, reverse=True)  # Sort boxes by height in decreasing order
 
         strips: list[list[Box]] = []
@@ -29,7 +29,7 @@ class Algorithms:
             for strip in strips:
                 if placed:
                     break
-                available_strip_space = bin_widht
+                available_strip_space = bin_width
                 for placed_box in strip:
                     available_strip_space -= placed_box.w
                 if available_strip_space >= box.w: # Check if the box fits into the strip
@@ -62,14 +62,14 @@ class Algorithms:
 
 
     @staticmethod
-    def __NFDH(boxes: list[Box], bin_widht) -> list[list[Box]]:
+    def __NFDH(boxes: list[Box], bin_width) -> list[list[Box]]:
         boxes.sort(key=lambda box: box.h, reverse=True)  # Sort boxes by height in decreasing order
 
         strips: list[list[Box]] = [[]]
 
         i = 0
         for box in boxes:
-            available_strip_space = bin_widht
+            available_strip_space = bin_width
             for placed_box in strips[i]:
                 available_strip_space -= placed_box.w
             if available_strip_space >= box.w: # Check if the box fits into the strip
@@ -121,7 +121,7 @@ class Algorithms:
     def HFF(bin_size: tuple, boxes: list[Box]) -> list[list[Box]]:
         '''Hybrid First-Fit'''
         # First phase: FFDH algorithm to create a strip packing
-        strips = Algorithms.__FFDH(boxes, bin_widht=bin_size[0])
+        strips = Algorithms.__FFDH(boxes, bin_width=bin_size[0])
         # Second phase: FFD algorithm to create finite bin packing solutions
         bins_with_strips = Algorithms.__FFD(strips, bin_height=bin_size[1])
         return Algorithms.__unstrip_bins(bins_with_strips)
@@ -130,7 +130,7 @@ class Algorithms:
     def HNF(bin_size: tuple, boxes: list[Box]) -> list[list[Box]]:
         '''Hybrid Next-Fit'''
         # First phase: NFDH algorithm to create a strip packing
-        strips = Algorithms.__NFDH(boxes, bin_widht=bin_size[0])
+        strips = Algorithms.__NFDH(boxes, bin_width=bin_size[0])
         # Second phase: NFD algorithm to create finite bin packing solutions
         bins_with_strips = Algorithms.__NFD(strips, bin_height=bin_size[1])
         return Algorithms.__unstrip_bins(bins_with_strips)
