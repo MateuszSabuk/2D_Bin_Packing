@@ -16,8 +16,64 @@ class Algorithms:
         - NBL - Next Bottom-left
         - AD - Alternate Directions
     '''
+    
+    @staticmethod
+    def HFF(bin_size: tuple, boxes: list[Box]) -> list[list[Box]]:
+        '''Hybrid First-Fit'''
+        # First phase: FFDH algorithm to create a strip packing
+        strips = Algorithms.__FFDH(boxes, bin_width=bin_size[0])
+        # Second phase: FFD algorithm to create finite bin packing solutions
+        bins_with_strips = Algorithms.__FFD(strips, bin_height=bin_size[1])
+        return Algorithms.__unstrip_bins(bins_with_strips)
 
-    # PRIVATE HELPER FUNCTIONS
+    @staticmethod
+    def HNF(bin_size: tuple, boxes: list[Box]) -> list[list[Box]]:
+        '''Hybrid Next-Fit'''
+        # First phase: NFDH algorithm to create a strip packing
+        strips = Algorithms.__NFDH(boxes, bin_width=bin_size[0])
+        # Second phase: NFD algorithm to create finite bin packing solutions
+        bins_with_strips = Algorithms.__NFD(strips, bin_height=bin_size[1])
+        return Algorithms.__unstrip_bins(bins_with_strips)
+
+    @staticmethod
+    def HBF(bin_size: tuple, boxes: list[Box]):
+        '''Hybrid Best-Fit'''
+        pass
+
+    @staticmethod
+    def FC(bin_size: tuple, boxes: list[Box]):
+        '''Floor-Ceiling'''
+        pass
+
+    @staticmethod
+    def FNF(bin_size: tuple, boxes: list[Box]):
+        '''Finite Next-Fit'''
+        pass
+
+    @staticmethod
+    def FFF(bin_size: tuple, boxes: list[Box]):
+        '''Finite First-Fit'''
+        pass
+
+    @staticmethod
+    def FBL(bin_size: tuple, boxes: list[Box]):
+        '''Finite Bottom-left'''
+        pass
+
+    @staticmethod
+    def NBL(bin_size: tuple, boxes: list[Box]):
+        '''Next Bottom-left'''
+        pass
+    
+    @staticmethod
+    def AD(bin_size: tuple, boxes: list[Box]):
+        '''Alternate Directions'''
+        pass
+
+
+    # ######################################################
+    # ############# PRIVATE HELPER FUNCTIONS ###############
+    # ######################################################
     @staticmethod
     def __FFDH(boxes: list[Box], bin_width) -> list[list[Box]]:
         boxes.sort(key=lambda box: box.h, reverse=True)  # Sort boxes by height in decreasing order
@@ -97,6 +153,45 @@ class Algorithms:
 
         return bins
     
+
+    @staticmethod
+    def __BFDH(boxes: list[Box], bin_width) -> list[list[Box]]:
+        pass # Not yet implemented
+        # boxes.sort(key=lambda box: box.h, reverse=True)  # Sort boxes by height in decreasing order
+
+        # strips: list[list[Box]] = [[]]
+        # strips_left_space = [ bin_width ]
+
+        # i = 0
+        # for box in boxes:
+        #     strips
+        #     for strip_left_space in strips_left_space:
+        #         if available_strip_space >= box.w: # Check if the box fits into the strip
+        #             strips[i].append(box)
+        #         else: # Create new strip
+        #             strips.append([box])
+        #             i += 1
+
+        # return strips
+
+    @staticmethod
+    def __BFD(strips: list[list[Box]], bin_height):
+        pass # Not yet implemented
+        # bins: list[list[list[Box]]] = [[]]
+
+        # i = 0
+        # for strip in strips:
+        #     available_bin_space = bin_height
+        #     for placed_strip in bins[i]:
+        #         available_bin_space -= placed_strip[0].h
+        #     if available_bin_space >= strip[0].h:
+        #         bins[i].append(strip)
+        #     else:
+        #         bins.append([strip])
+        #         i += 1
+
+        # return bins
+    
     
     @staticmethod
     def __unstrip_bins(bins_with_strips: list[list[list[Box]]]) -> list[list[Box]]:
@@ -115,57 +210,3 @@ class Algorithms:
                 y += strip[0].h
         
         return bins
-
-    
-    @staticmethod
-    def HFF(bin_size: tuple, boxes: list[Box]) -> list[list[Box]]:
-        '''Hybrid First-Fit'''
-        # First phase: FFDH algorithm to create a strip packing
-        strips = Algorithms.__FFDH(boxes, bin_width=bin_size[0])
-        # Second phase: FFD algorithm to create finite bin packing solutions
-        bins_with_strips = Algorithms.__FFD(strips, bin_height=bin_size[1])
-        return Algorithms.__unstrip_bins(bins_with_strips)
-
-    @staticmethod
-    def HNF(bin_size: tuple, boxes: list[Box]) -> list[list[Box]]:
-        '''Hybrid Next-Fit'''
-        # First phase: NFDH algorithm to create a strip packing
-        strips = Algorithms.__NFDH(boxes, bin_width=bin_size[0])
-        # Second phase: NFD algorithm to create finite bin packing solutions
-        bins_with_strips = Algorithms.__NFD(strips, bin_height=bin_size[1])
-        return Algorithms.__unstrip_bins(bins_with_strips)
-
-    @staticmethod
-    def HBF(bin_size: tuple, boxes: list[Box]):
-        '''Hybrid Best-Fit'''
-        pass
-
-    @staticmethod
-    def FC(bin_size: tuple, boxes: list[Box]):
-        '''Floor-Ceiling'''
-        pass
-
-    @staticmethod
-    def FNF(bin_size: tuple, boxes: list[Box]):
-        '''Finite Next-Fit'''
-        pass
-
-    @staticmethod
-    def FFF(bin_size: tuple, boxes: list[Box]):
-        '''Finite First-Fit'''
-        pass
-
-    @staticmethod
-    def FBL(bin_size: tuple, boxes: list[Box]):
-        '''Finite Bottom-left'''
-        pass
-
-    @staticmethod
-    def NBL(bin_size: tuple, boxes: list[Box]):
-        '''Next Bottom-left'''
-        pass
-    
-    @staticmethod
-    def AD(bin_size: tuple, boxes: list[Box]):
-        '''Alternate Directions'''
-        pass
