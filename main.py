@@ -60,6 +60,10 @@ class BinPackingApp:
             command= self.run_solver)
         self.run_solver_button.pack(pady=5)
 
+        tk.Label(self.inputs_frame, text="Output:").pack()
+        self.output_label = tk.Label(self.inputs_frame, text="")
+        self.output_label.pack()
+        
         self.canvas = tk.Canvas(self.master, width=1000, height=1000, bg='white')
         self.canvas.grid(row = 0, column = 1, sticky = tk.W, padx = 2)
 
@@ -78,8 +82,10 @@ class BinPackingApp:
                 int(self.num_of_boxes_entry.get()))
             self.boxes_text.delete('1.0', tk.END)
             self.boxes_text.insert(1.0, self.bss.get_boxes_text())
+            self.output_label.config(text="Generated boxes", bg="green")
         except Exception as err:
             print(f"Exception: {err}")
+            self.output_label.config(text=err, bg="red")
         
     def run_solver(self):
         self.num = 0
@@ -96,8 +102,10 @@ class BinPackingApp:
             # Draw the data
             self.draw_bins(bins1, bin_size = self.bss.bin_size)
             self.draw_bins(bins2, bin_size = self.bss.bin_size)
+            self.output_label.config(text="Solved succesfully", bg="green")
         except ValidationError as err:
             print(f"Exception: {err}")
+            self.output_label.config(text=err, bg="red")
 
     def draw_bins(self, bins, bin_size):
         scale = 10

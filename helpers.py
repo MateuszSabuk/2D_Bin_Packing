@@ -81,7 +81,7 @@ class BoxStackingSolver:
         '''Updates the state of solver boxes list'''
         new_boxes = []
         for i, line in enumerate(text.splitlines()):
-            match = re.match(r'(\d+)x(\d+)', line)
+            match = re.match(r'^(\d+)x(\d+)$', line)
             if match:
                 width, height = map(int, match.groups())
                 if width > self.bin_size[0] or height > self.bin_size[1]:
@@ -96,7 +96,7 @@ class BoxStackingSolver:
         self.boxes = new_boxes
 
     def update_bin_size(self, text: str) -> None:
-        match = re.match(r'([1-9]\d*)x([1-9]\d*)', text)
+        match = re.match(r'^([1-9]\d*)x([1-9]\d*)$', text)
         if match:
             w, h = map(int, match.groups())
             self.bin_size = (w, h)
