@@ -10,7 +10,7 @@ Create a visual solver for 2D Bin Packing Problem
 - Two-phase algorithms
   - [x] Hybrid First-Fit (HFF)
   - [x] Hybrid Next-Fit (HNF)
-  - [ ] Hybrid Best-Fit (HBF)
+  - [x] Hybrid Best-Fit (HBF)
   - [ ] Floor-Ceiling (FC) algorithm
 - One-phase algorithms
   - [ ] Finite Next-Fit (FNF)

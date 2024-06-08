@@ -36,9 +36,13 @@ class Algorithms:
         return Algorithms.__unstrip_bins(bins_with_strips)
 
     @staticmethod
-    def HBF(bin_size: tuple, boxes: list[Box]):
+    def HBF(bin_size: tuple, boxes: list[Box]) -> list[list[Box]]:
         '''Hybrid Best-Fit'''
-        pass
+        # First phase: BFDH algorithm to create a strip packing
+        strips = Algorithms.__BFDH(boxes, bin_width=bin_size[0])
+        # Second phase: BFD algorithm to create finite bin packing solutions
+        bins_with_strips = Algorithms.__BFD(strips, bin_height=bin_size[1])
+        return Algorithms.__unstrip_bins(bins_with_strips)
 
     @staticmethod
     def FC(bin_size: tuple, boxes: list[Box]):
@@ -156,43 +160,65 @@ class Algorithms:
 
     @staticmethod
     def __BFDH(boxes: list[Box], bin_width) -> list[list[Box]]:
-        pass # Not yet implemented
-        # boxes.sort(key=lambda box: box.h, reverse=True)  # Sort boxes by height in decreasing order
+        # Sort boxes by height in decreasing order
+        boxes.sort(key=lambda box: box.h, reverse=True)
 
-        # strips: list[list[Box]] = [[]]
-        # strips_left_space = [ bin_width ]
+        strips: list[list[Box]] = []
+        strip_left_space = []
 
-        # i = 0
-        # for box in boxes:
-        #     strips
-        #     for strip_left_space in strips_left_space:
-        #         if available_strip_space >= box.w: # Check if the box fits into the strip
-        #             strips[i].append(box)
-        #         else: # Create new strip
-        #             strips.append([box])
-        #             i += 1
+        for box in boxes:
+            best_strip_index = None
+            min_space_left = float('inf')
 
-        # return strips
+            for i, space in enumerate(strip_left_space):
+                # Check if this bin has the least space left that can ffit the strip
+                if space >= box.w and space < min_space_left:
+                    min_space_left = space
+                    best_strip_index = i
+
+            if best_strip_index is not None:
+                # Place the strip in the bin with the smallest space left
+                strips[best_strip_index].append(box)
+                strip_left_space[best_strip_index] -= box.w
+            else:
+                # Create a new strip
+                new_strip = [box]
+                strips.append(new_strip)
+                strip_left_space.append(bin_width - box.w)
+
+        return strips
 
     @staticmethod
     def __BFD(strips: list[list[Box]], bin_height):
-        pass # Not yet implemented
-        # bins: list[list[list[Box]]] = [[]]
+        bins: list[list[list[Box]]] = [[]]
 
-        # i = 0
-        # for strip in strips:
-        #     available_bin_space = bin_height
-        #     for placed_strip in bins[i]:
-        #         available_bin_space -= placed_strip[0].h
-        #     if available_bin_space >= strip[0].h:
-        #         bins[i].append(strip)
-        #     else:
-        #         bins.append([strip])
-        #         i += 1
+        bin_left_space = [bin_height]
 
-        # return bins
-    
-    
+        for strip in strips:
+            best_bin_index = None
+            min_space_left = float('inf')
+
+            for i, space in enumerate(bin_left_space):
+                # Check if this bin has the least space left that can ffit the strip
+                if space >= strip[0].h and space < min_space_left:
+                    min_space_left = space
+                    best_bin_index = i
+
+            if best_bin_index is not None:
+                # Place the strip in the bin with the smallest space left
+                bins[best_bin_index].append(strip)
+                bin_left_space[best_bin_index] -= strip[0].h
+            else:
+                # Create a new bin
+                new_bin = [strip]
+                bins.append(new_bin)
+                bin_left_space.append(bin_height - strip[0].h)
+
+        # Remove empty bins
+        bins = [bin for bin in bins if bin]
+
+        return bins
+
     @staticmethod
     def __unstrip_bins(bins_with_strips: list[list[list[Box]]]) -> list[list[Box]]:
         '''Sets the positions of the boxes in each bin'''
