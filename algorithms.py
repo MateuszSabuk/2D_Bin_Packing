@@ -112,8 +112,8 @@ class Algorithms:
                     bin.append(strip)
                     placed = True
             if not placed: # Create new bin
-                bins.append([strip])    
-
+                bins.append([strip])
+        bins = [bin for bin in bins if bin]
         return bins
 
 
@@ -150,7 +150,7 @@ class Algorithms:
             else:
                 bins.append([strip])
                 i += 1
-
+        bins = [bin for bin in bins if bin]
         return bins
     
 
