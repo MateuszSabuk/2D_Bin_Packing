@@ -58,6 +58,15 @@ class BinPackingApp:
         self.bin_size_entry.insert(0,"20x15")
         self.bin_size_entry.grid(row=5, column=0, columnspan=3)
 
+        # Buttons and others
+        self.gen_boxes_button = tk.Button(self.inputs_frame,
+            text="Generate Boxes",
+            command= self.gen_boxes)
+        self.gen_boxes_button.pack(pady=5)
+
+        self.boxes_text: tk.Text = tk.Text(self.inputs_frame, width=10)
+        self.boxes_text.pack()
+        
         # Algorithm selection
         tk.Label(self.inputs_frame, text="Select Algorithms:").pack()
         self.selected_algorithms = []
@@ -68,15 +77,6 @@ class BinPackingApp:
             self.algorithm_vars.append(var)
             checkbox = tk.Checkbutton(self.inputs_frame, text=algorithm_name, variable=var, onvalue=True, offvalue=False)
             checkbox.pack()
-
-        # Buttons and others
-        self.gen_boxes_button = tk.Button(self.inputs_frame,
-            text="Generate Boxes",
-            command= self.gen_boxes)
-        self.gen_boxes_button.pack(pady=5)
-
-        self.boxes_text: tk.Text = tk.Text(self.inputs_frame, width=10)
-        self.boxes_text.pack()
 
         self.run_solver_button = tk.Button(self.inputs_frame,
             text="Run Solver",
