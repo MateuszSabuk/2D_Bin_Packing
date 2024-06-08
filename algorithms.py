@@ -4,6 +4,8 @@ class Algorithms:
     '''
     Algorithms for the problem solving\\
     Provides multiple functions:
+    - get_implemented_names()
+
     - Two-phase algorithms
         - HFF - Hybrid First-Fit
         - HNF - Hybrid Next-Fit
@@ -16,6 +18,9 @@ class Algorithms:
         - NBL - Next Bottom-left
         - AD - Alternate Directions
     '''
+    @staticmethod
+    def get_implemented_names():
+        return ["HFF", "HNF", "HBF"]
     
     @staticmethod
     def HFF(bin_size: tuple, boxes: list[Box]) -> list[list[Box]]:

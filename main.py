@@ -62,7 +62,7 @@ class BinPackingApp:
         tk.Label(self.inputs_frame, text="Select Algorithms:").pack()
         self.selected_algorithms = []
         self.algorithm_vars = []
-        for algorithm_name in ["HFF", "HNF", "HBF"]:
+        for algorithm_name in Algorithms.get_implemented_names():
             var = tk.BooleanVar()
             var.set(False)
             self.algorithm_vars.append(var)
@@ -117,7 +117,7 @@ class BinPackingApp:
             self.bss.update_bin_size(self.bin_size_entry.get())
             self.bss.update_boxes_from_txt(self.boxes_text.get("1.0", tk.END))
 
-            selected_algorithms = [name for name, var in zip(["HFF", "HNF", "HBF"], self.algorithm_vars) if var.get()]
+            selected_algorithms = [name for name, var in zip(Algorithms.get_implemented_names(), self.algorithm_vars) if var.get()]
 
             for algorithm_name in selected_algorithms:
                 algorithm_function = getattr(Algorithms, algorithm_name)
