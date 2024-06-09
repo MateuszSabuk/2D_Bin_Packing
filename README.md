@@ -24,7 +24,7 @@ Create a visual solver for 2D Bin Packing Problem
 - [x] 2D box generator
 - [x] Bin size generator
 - [x] Algorithm choice
-- [ ] Fill percentage indicator
+- [x] Fill percentage indicator
 - [x] Graphical controls and visualization
 
 Also nice to have:
