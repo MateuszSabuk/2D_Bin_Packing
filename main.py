@@ -62,17 +62,6 @@ class BinPackingApp:
         self.bin_size_entry.insert(0,"20x15")
         self.bin_size_entry.grid(row=5, column=0, columnspan=3)
 
-        # Algorithm selection
-        tk.Label(self.inputs_frame, text="Select Algorithms:").pack()
-        self.selected_algorithms = []
-        self.algorithm_vars = []
-        for algorithm_name in ["HFF", "HNF", "HBF"]:
-            var = tk.BooleanVar()
-            var.set(False)
-            self.algorithm_vars.append(var)
-            checkbox = tk.Checkbutton(self.inputs_frame, text=algorithm_name, variable=var, onvalue=True, offvalue=False)
-            checkbox.pack()
-
         # Buttons and others
         self.gen_boxes_button = tk.Button(self.inputs_frame,
             text="Generate Boxes",
@@ -81,6 +70,17 @@ class BinPackingApp:
 
         self.boxes_text: tk.Text = tk.Text(self.inputs_frame, width=10)
         self.boxes_text.pack()
+
+        # Algorithm selection
+        tk.Label(self.inputs_frame, text="Select Algorithms:").pack()
+        self.selected_algorithms = []
+        self.algorithm_vars = []
+        for algorithm_name in Algorithms.get_implemented_names():
+            var = tk.BooleanVar()
+            var.set(False)
+            self.algorithm_vars.append(var)
+            checkbox = tk.Checkbutton(self.inputs_frame, text=algorithm_name, variable=var, onvalue=True, offvalue=False)
+            checkbox.pack()
 
         self.run_solver_button = tk.Button(self.inputs_frame,
             text="Run Solver",
@@ -121,7 +121,7 @@ class BinPackingApp:
             self.bss.update_bin_size(self.bin_size_entry.get())
             self.bss.update_boxes_from_txt(self.boxes_text.get("1.0", tk.END))
 
-            selected_algorithms = [name for name, var in zip(["HFF", "HNF", "HBF"], self.algorithm_vars) if var.get()]
+            selected_algorithms = [name for name, var in zip(Algorithms.get_implemented_names(), self.algorithm_vars) if var.get()]
 
             for algorithm_name in selected_algorithms:
                 algorithm_function = getattr(Algorithms, algorithm_name)
