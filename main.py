@@ -1,8 +1,10 @@
+import random
 import tkinter as tk
 import time
 
 from helpers import *
 from algorithms import Algorithms
+import matplotlib.colors as mcolors
 
 class BinPackingApp:
     def __init__(self):
@@ -58,6 +60,17 @@ class BinPackingApp:
         self.bin_size_entry.insert(0,"20x15")
         self.bin_size_entry.grid(row=5, column=0, columnspan=3)
 
+        # Algorithm selection
+        tk.Label(self.inputs_frame, text="Select Algorithms:").pack()
+        self.selected_algorithms = []
+        self.algorithm_vars = []
+        for algorithm_name in ["HFF", "HNF", "HBF"]:
+            var = tk.BooleanVar()
+            var.set(False)
+            self.algorithm_vars.append(var)
+            checkbox = tk.Checkbutton(self.inputs_frame, text=algorithm_name, variable=var, onvalue=True, offvalue=False)
+            checkbox.pack()
+
         # Buttons and others
         self.gen_boxes_button = tk.Button(self.inputs_frame,
             text="Generate Boxes",
@@ -66,17 +79,6 @@ class BinPackingApp:
 
         self.boxes_text: tk.Text = tk.Text(self.inputs_frame, width=10)
         self.boxes_text.pack()
-        
-        # Algorithm selection
-        tk.Label(self.inputs_frame, text="Select Algorithms:").pack()
-        self.selected_algorithms = []
-        self.algorithm_vars = []
-        for algorithm_name in Algorithms.get_implemented_names():
-            var = tk.BooleanVar()
-            var.set(False)
-            self.algorithm_vars.append(var)
-            checkbox = tk.Checkbutton(self.inputs_frame, text=algorithm_name, variable=var, onvalue=True, offvalue=False)
-            checkbox.pack()
 
         self.run_solver_button = tk.Button(self.inputs_frame,
             text="Run Solver",
@@ -117,7 +119,7 @@ class BinPackingApp:
             self.bss.update_bin_size(self.bin_size_entry.get())
             self.bss.update_boxes_from_txt(self.boxes_text.get("1.0", tk.END))
 
-            selected_algorithms = [name for name, var in zip(Algorithms.get_implemented_names(), self.algorithm_vars) if var.get()]
+            selected_algorithms = [name for name, var in zip(["HFF", "HNF", "HBF"], self.algorithm_vars) if var.get()]
 
             for algorithm_name in selected_algorithms:
                 algorithm_function = getattr(Algorithms, algorithm_name)
@@ -162,11 +164,11 @@ class BinPackingApp:
         canvas_width = self.master.winfo_screenwidth()
         scale = 10.2 * canvas_width/2560
         bin_offset = scale * 1.1 * bin_size[0]
-        print(bin_offset)
         bin_y_offset = scale * 1.1 * bin_size[1]
 
+        list_of_colors = list(mcolors.CSS4_COLORS.values())
+
         x_offset = (canvas_width - (11*bin_offset))/2
-        print(x_offset)
         y_text_offset = 40
 
         num_rows = ((len(bins) - len(bins) % 11) / 11 + 1)
@@ -177,27 +179,52 @@ class BinPackingApp:
         if total_bins_height > canvas.winfo_height():
             canvas.config(scrollregion=(0, 0, canvas.winfo_width(), total_bins_height))
 
-        canvas.create_text(canvas_width/2, 20,
-                                text=f'{algorithm_name}: {computing_time:.4f}s, bins used: {len(bins)}',
-                                font=('Arial', 16, 'bold'))
-
         bin_row_x_offset = x_offset
+        box_fill_lvl = []
+
+        # Choose the color of the box size text depending on the bg
+        def get_luminance(hex_color):
+            colour = hex_color[1:]
+            hex_red = int(colour[0:2], base=16)
+            hex_green = int(colour[2:4], base=16)
+            hex_blue = int(colour[4:6], base=16)
+
+            return hex_red * 0.2126 + hex_green * 0.7152 + hex_blue * 0.0722
+
         for bin_idx, bin in enumerate(bins):
+            number_of_col = 0
             if bin_row_x_offset + bin_offset > canvas_width:
                 bin_row_x_offset = x_offset
                 y_text_offset += bin_y_offset + 30
 
             for box_idx, box in enumerate(bin):
+                fill = list_of_colors[number_of_col]
+                fill = str(fill)
                 x0 = box.x * scale + bin_row_x_offset
                 y0 = box.y * scale + y_text_offset
                 x1 = x0 + box.w * scale
                 y1 = y0 + box.h * scale
-                canvas.create_rectangle(x0, y0, x1, y1, outline='red')
+
+                box_field = box.w * box.h
+                box_fill_lvl.append(box_field)
+
+                if get_luminance(fill) <= 140:
+                    color = 'white'
+                else:
+                    color = 'black'
+
+                canvas.create_rectangle(x0, y0, x1, y1, outline='red', fill=fill)
                 if box.w < 3:
                     canvas.create_text((x0 + x1) / 2, (y0 + y1) / 2,
-                                       text=f'{box.w}x{box.h}', font=('Arial', 8), angle=90)
+                                       text=f'{box.w}x{box.h}', font=('Arial', 8), angle=90, fill = color)
                 else:
-                    canvas.create_text((x0 + x1) / 2, (y0 + y1) / 2, text=f'{box.w}x{box.h}', font=('Arial', 8))
+                    canvas.create_text((x0 + x1) / 2, (y0 + y1) / 2, text=f'{box.w}x{box.h}',
+                                       font=('Arial', 8), fill = color)
+                if number_of_col <= 146:
+                    number_of_col += 1
+                else:
+                    number_of_col = 0
+                print()
 
             # Draw a rectangle for each bin
             canvas.create_rectangle(
@@ -209,6 +236,11 @@ class BinPackingApp:
 
             bin_row_x_offset += bin_offset
 
+        fill_percentage = sum(box_fill_lvl)*100 / ((bin_size[0] * bin_size[1]) * len(bins))
+        canvas.create_text(canvas_width/2, 20,
+                                text=f'{algorithm_name}, Computing time: {computing_time:.4f}s, '
+                                f'Number of bins used: {len(bins)}, Packing efficiency {fill_percentage:.2f}% ',
+                                font=('Arial', 16, 'bold'))
 
 def main():
     app = BinPackingApp()
