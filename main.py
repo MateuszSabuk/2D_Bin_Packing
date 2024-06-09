@@ -7,7 +7,9 @@ from algorithms import Algorithms
 import matplotlib.colors as mcolors
 
 class BinPackingApp:
+    
     def __init__(self):
+        
         self.canvas = None
         self.bss = BoxStackingSolver() # Create the main solver
         self.master = tk.Tk()
@@ -88,7 +90,7 @@ class BinPackingApp:
         tk.Label(self.inputs_frame, text="Output:").pack()
         self.output_label = tk.Label(self.inputs_frame, text="")
         self.output_label.pack()
-
+        
     def run(self):
         self.master.mainloop()
 
