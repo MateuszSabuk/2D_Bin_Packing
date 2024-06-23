@@ -1,3 +1,4 @@
+import math
 from helpers import Box
 
 class Algorithms:
@@ -20,7 +21,7 @@ class Algorithms:
     '''
     @staticmethod
     def get_implemented_names():
-        return ["HFF", "HNF", "HBF", "FBL", "NBL"]
+        return ["HFF", "HNF", "HBF", "FBL", "NBL", "AD"]
     
     @staticmethod
     def HFF(bin_size: tuple, boxes: list[Box]) -> list[list[Box]]:
@@ -132,7 +133,80 @@ class Algorithms:
     @staticmethod
     def AD(bin_size: tuple, boxes: list[Box]):
         '''Alternate Directions'''
-        pass
+        total_area = sum(box.w * box.h for box in boxes)
+        bin_area = bin_size[0] * bin_size[1]
+        L = math.ceil(total_area / bin_area)
+        bins = [[] for _ in range(L)]
+
+        def fits_in_bin(bin, box):
+            for b in bin:
+                if not (b.x + b.w <= box.x or b.x >= box.x + box.w or b.y + b.h <= box.y or b.y >= box.y + box.h):
+                    return False
+            return True
+
+        def find_position(bin, box, direction='bottom'):
+            max_x, max_y = bin_size
+            if direction == 'bottom':
+                for y in range(max_y):
+                    for x in range(max_x):
+                        box.x, box.y = x, y
+                        if x + box.w <= max_x and y + box.h <= max_y and fits_in_bin(bin, box):
+                            return True
+            elif direction == 'left_to_right':
+                for x in range(max_x):
+                    for y in range(max_y):
+                        box.x, box.y = x, y
+                        if x + box.w <= max_x and y + box.h <= max_y and fits_in_bin(bin, box):
+                            return True
+            elif direction == 'right_to_left':
+                for x in range(max_x - 1, -1, -1):
+                    for y in range(max_y):
+                        box.x, box.y = x, y
+                        if x + box.w <= max_x and y + box.h <= max_y and fits_in_bin(bin, box):
+                            return True
+            return False
+
+        # Sort boxes by decreasing height
+        boxes.sort(key=lambda box: box.h, reverse=True)
+
+        # Pack first L bins using BFD
+        packed = []
+        for box in boxes:
+            placed = False
+            for bin in bins:
+                if find_position(bin, box, direction='bottom'):
+                    bin.append(box)
+                    packed.append(box)
+                    placed = True
+                    break
+            if not placed:
+                break
+
+        remaining_boxes = [box for box in boxes if box not in packed]
+
+        # Pack remaining items in alternate directions
+        direction = 'left_to_right'
+        current_bin_index = 0
+        while remaining_boxes:
+            current_box = remaining_boxes.pop(0)
+            placed = False
+            while current_bin_index < len(bins):
+                if find_position(bins[current_bin_index], current_box, direction=direction):
+                    bins[current_bin_index].append(current_box)
+                    placed = True
+                    break
+                current_bin_index += 1
+
+            if not placed:
+                current_bin_index = len(bins)
+                new_bin = []
+                bins.append(new_bin)
+                find_position(new_bin, current_box, direction=direction)
+                new_bin.append(current_box)
+
+            direction = 'right_to_left' if direction == 'left_to_right' else 'left_to_right'
+
+        return bins
 
 
     # ######################################################
