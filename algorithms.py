@@ -20,7 +20,7 @@ class Algorithms:
     '''
     @staticmethod
     def get_implemented_names():
-        return ["HFF", "HNF", "HBF"]
+        return ["HFF", "HNF", "HBF", "FBL"]
     
     @staticmethod
     def HFF(bin_size: tuple, boxes: list[Box]) -> list[list[Box]]:
@@ -55,19 +55,43 @@ class Algorithms:
         pass
 
     @staticmethod
-    def FNF(bin_size: tuple, boxes: list[Box]):
-        '''Finite Next-Fit'''
-        pass
-
-    @staticmethod
-    def FFF(bin_size: tuple, boxes: list[Box]):
-        '''Finite First-Fit'''
-        pass
-
-    @staticmethod
-    def FBL(bin_size: tuple, boxes: list[Box]):
+    def FBL(bin_size: tuple, boxes: list[Box]) -> list[list[Box]]:
         '''Finite Bottom-left'''
-        pass
+        boxes.sort(key=lambda box: box.w, reverse=True)  # Sort boxes by width in decreasing order
+            
+        bins = []
+
+        def fits_in_bin(bin, box):
+            for b in bin:
+                if not (b.x + b.w <= box.x or b.x >= box.x + box.w or b.y + b.h <= box.y or b.y >= box.y + box.h):
+                    return False
+            return True
+
+        def find_position(bin, box):
+            max_x, max_y = bin_size
+            for y in range(max_y):
+                for x in range(max_x):
+                    box.x, box.y = x, y
+                    if x + box.w <= max_x and y + box.h <= max_y and fits_in_bin(bin, box):
+                        return True
+            return False
+
+        for box in boxes:
+            placed = False
+            for bin in bins:
+                if find_position(bin, box):
+                    bin.append(box)
+                    placed = True
+                    break
+            if not placed:
+                new_bin = []
+                if find_position(new_bin, box):
+                    new_bin.append(box)
+                    bins.append(new_bin)
+        bins = [bin for bin in bins if bin]
+        return bins
+
+
 
     @staticmethod
     def NBL(bin_size: tuple, boxes: list[Box]):
